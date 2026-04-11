@@ -1,0 +1,7 @@
+node_modules/
+package-lock.json
+*.bak
+archive_originals/
+/tmp/
+.DS_Store
+*.obf.js

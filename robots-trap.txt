@@ -1,0 +1,34 @@
+# robots.txt additions for qalarc.com bot trap
+# Add these rules to your existing robots.txt
+#
+# The /trap/ path is INTENTIONALLY left accessible to bad bots.
+# Legitimate bots that respect robots.txt get blocked.
+# Scrapers that ignore robots.txt get funnelled into the trap.
+#
+# This is the classic "robots.txt as honeypot" technique.
+
+User-agent: *
+# Allow legit access to your real content
+Allow: /
+
+# Explicitly disallow your sensitive/scrape-worthy paths
+Disallow: /admin/
+Disallow: /config/
+Disallow: /assets/
+Disallow: /api/
+
+# ── HONEYPOT ENTRIES ──────────────────────────────────────────────────────────
+# These paths look attractive to scrapers but lead to the trap.
+# A bot that ignores robots.txt will hit these. A bot that respects it won't see your site anyway.
+#
+# DO NOT Disallow: /trap/ — we WANT bad bots to go there.
+# (Disallowing it would tell honest bots to avoid it, which is fine,
+#  but we want dishonest bots to find and enter it.)
+
+# Fake juicy paths that redirect to the trap (set up in nginx or .htaccess)
+# Disallow: /data/export     <- comment these out if using nginx redirect approach
+# Disallow: /source/
+# Disallow: /download/
+
+# Search engine sitemaps
+Sitemap: https://qalarc.com/sitemap.xml

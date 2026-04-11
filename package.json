@@ -1,0 +1,32 @@
+{
+  "name": "bot_loop_for_projects_anti_scrape",
+  "version": "1.0.0",
+  "description": "Three-layer JS protection: obfuscator, infinite bot trap server, client honeypot",
+  "main": "deploy.js",
+  "scripts": {
+    "obfuscate":          "node obfuscate.js --run",
+    "obfuscate:dry":      "node obfuscate.js",
+    "obfuscate:inplace":  "node obfuscate.js --inplace",
+    "inject":             "node inject-protection.js --run",
+    "inject:dry":         "node inject-protection.js",
+    "inject:remove":      "node inject-protection.js --remove",
+    "trap":               "node bot-trap.js",
+    "build":              "node deploy.js --build",
+    "build:dry":          "node deploy.js --dry-run --build",
+    "deploy":             "node deploy.js --deploy",
+    "deploy:dry":         "node deploy.js --dry-run --deploy",
+    "deploy:server":      "node deploy.js --server-setup",
+    "deploy:bella":       "node deploy.js --deploy --project bella",
+    "deploy:fivelidz":    "node deploy.js --deploy --project fivelidz",
+    "deploy:showcase":    "node deploy.js --deploy --project showcase",
+    "deploy:endispute":   "node deploy.js --deploy --project endispute"
+  },
+  "keywords": ["obfuscator", "bot-trap", "anti-scrape", "honeypot", "security"],
+  "author": "qalarc",
+  "license": "ISC",
+  "type": "commonjs",
+  "dependencies": {
+    "javascript-obfuscator": "^5.4.1",
+    "terser": "^5.46.1"
+  }
+}
