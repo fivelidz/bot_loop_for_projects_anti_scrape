@@ -84,7 +84,9 @@ const PROJECTS = [
     server: 'main',
     remotePath: '/home/fivelidz/public_html/endispute',
     description: 'Endispute site',
-    // Only deploy the clean build, not the original_site archives
+    // original_site/ and verbose_version/ are archived source backups — never deploy them.
+    // buildSkip applies during the copy step; excludePatterns applies during rsync.
+    buildSkip: ['original_site', 'verbose_version'],
     excludePatterns: ['original_site/', 'verbose_version/', 'archive*/'],
   },
   {
@@ -175,11 +177,11 @@ function log(msg, level = 'info') {
   console.log((prefix[level] || '  ') + msg);
 }
 
-function shouldSkip(filePath) {
-  return SKIP_PATTERNS.some(p => filePath.includes(p));
+function shouldSkip(filePath, skipPatterns = SKIP_PATTERNS) {
+  return skipPatterns.some(p => filePath.includes(p));
 }
 
-function copyDir(src, dest) {
+function copyDir(src, dest, skipPatterns = SKIP_PATTERNS) {
   if (!fs.existsSync(src)) { log(`Source not found: ${src}`, 'warn'); return; }
   fs.mkdirSync(dest, { recursive: true });
   let entries;
@@ -192,13 +194,13 @@ function copyDir(src, dest) {
   for (const e of entries) {
     const s = path.join(src, e.name);
     const d = path.join(dest, e.name);
-    if (shouldSkip(s)) continue;
-    if (e.isDirectory()) copyDir(s, d);
+    if (shouldSkip(s, skipPatterns)) continue;
+    if (e.isDirectory()) copyDir(s, d, skipPatterns);
     else fs.copyFileSync(s, d);
   }
 }
 
-function collectFiles(dir, ext, results = []) {
+function collectFiles(dir, ext, results = [], skipPatterns = SKIP_PATTERNS) {
   if (!fs.existsSync(dir)) return results;
   let entries;
   try {
@@ -208,8 +210,8 @@ function collectFiles(dir, ext, results = []) {
   }
   for (const e of entries) {
     const full = path.join(dir, e.name);
-    if (shouldSkip(full)) continue;
-    if (e.isDirectory()) collectFiles(full, ext, results);
+    if (shouldSkip(full, skipPatterns)) continue;
+    if (e.isDirectory()) collectFiles(full, ext, results, skipPatterns);
     else if (e.isFile() && e.name.endsWith(ext)) results.push(full);
   }
   return results;
@@ -394,11 +396,15 @@ for (const project of targets) {
   log(`Processing: ${project.description}  [${project.name}]`, 'step');
 
   // 2a. Copy source to build dir
+  // buildSkip entries are folder names that should never go into the build
+  // (e.g. original_site/ and verbose_version/ for endispute)
+  const buildSkipPatterns = [...SKIP_PATTERNS, ...(project.buildSkip || [])];
   log(`Copying ${project.localSrc} → ${buildDest}`);
   if (!isDryRun) {
-    copyDir(project.localSrc, buildDest);
+    copyDir(project.localSrc, buildDest, buildSkipPatterns);
     log(`Copy complete`, 'ok');
   } else {
+    if (project.buildSkip) log(`Excluding from build: ${project.buildSkip.join(', ')}`, 'info');
     log(`Would copy to ${buildDest}`, 'info');
   }
 
