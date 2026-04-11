@@ -19,7 +19,9 @@
     "deploy:bella":       "node deploy.js --deploy --project bella",
     "deploy:fivelidz":    "node deploy.js --deploy --project fivelidz",
     "deploy:showcase":    "node deploy.js --deploy --project showcase",
-    "deploy:endispute":   "node deploy.js --deploy --project endispute"
+    "deploy:endispute":   "node deploy.js --deploy --project endispute",
+    "sitemap":            "node /home/fivelidz/projects/projects-showcase-site/generate-sitemap.js",
+    "test":               "node test-suite.js"
   },
   "keywords": ["obfuscator", "bot-trap", "anti-scrape", "honeypot", "security"],
   "author": "qalarc",
