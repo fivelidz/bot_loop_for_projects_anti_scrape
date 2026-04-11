@@ -94,6 +94,8 @@ const OBFUSCATOR_OPTIONS_LIGHT = {
   stringArrayRotate: true,
   stringArrayShuffle: true,
   stringArrayThreshold: 1.0,    // 100% — encode ALL strings, no exceptions
+  transformObjectKeys: true,    // FIX: without this, object keys like {smoothingFactor:0.7}
+                                // leak as plain-text strings even with threshold:1.0
   unicodeEscapeSequence: false,
 };
 
