@@ -161,12 +161,12 @@ const OBFUSCATOR_OPTIONS_LIGHT = {
   renameGlobals: false,
   selfDefending: true,
   splitStrings: true,
-  splitStringsChunkLength: 10,
+  splitStringsChunkLength: 4,   // shorter chunks = more strings get broken up
   stringArray: true,
   stringArrayEncoding: ['base64'],
   stringArrayRotate: true,
   stringArrayShuffle: true,
-  stringArrayThreshold: 0.75,
+  stringArrayThreshold: 1.0,    // 100% — encode ALL strings, no exceptions
   unicodeEscapeSequence: false,
 };
 

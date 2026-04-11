@@ -89,7 +89,10 @@ const LEGITIMATE_BOTS = [
 function isBot(req) {
   const ua = req.headers['user-agent'] || '';
 
-  // Let legitimate search engines through
+  // No user-agent at all = almost certainly automated (every real browser sends one)
+  if (!ua) return true;
+
+  // Let legitimate search engines through before any other checks
   if (LEGITIMATE_BOTS.some(p => p.test(ua))) return false;
 
   // Known bad UAs
@@ -99,12 +102,11 @@ function isBot(req) {
   if (!req.headers['accept-language']) return true;
   if (!req.headers['accept']) return true;
 
-  // Headless browser signals
+  // Explicit headless/scraper self-identification
   if (req.headers['x-headless'] || req.headers['x-scraper']) return true;
 
-  // Missing sec-fetch-site header = not a modern browser making a navigation request.
-  // By the time we reach this line, accept-language is guaranteed present (checked above),
-  // so only check sec-fetch-site on its own.
+  // Missing sec-fetch-site = not a modern browser making a navigation request.
+  // accept-language is guaranteed present at this point (checked above).
   if (!req.headers['sec-fetch-site']) return true;
 
   return false;
@@ -369,10 +371,20 @@ function generateFakeJSON(pathKey) {
     return obj;
   };
 
+  // Use a seeded fake timestamp so the entire response is deterministic.
+  // Real scrapers don't validate timestamps — they just want the data structure.
+  const fakeYear  = rng(2021, 2025);
+  const fakeMon   = String(rng(1, 12)).padStart(2, '0');
+  const fakeDay   = String(rng(1, 28)).padStart(2, '0');
+  const fakeHour  = String(rng(0, 23)).padStart(2, '0');
+  const fakeMin   = String(rng(0, 59)).padStart(2, '0');
+  const fakeSec   = String(rng(0, 59)).padStart(2, '0');
+  const fakeTs    = `${fakeYear}-${fakeMon}-${fakeDay}T${fakeHour}:${fakeMin}:${fakeSec}.000Z`;
+
   return JSON.stringify({
     status: 'ok',
     version: `${rng(1,5)}.${rng(0,9)}.${rng(0,99)}`,
-    timestamp: new Date().toISOString(),
+    timestamp: fakeTs,
     data: Array.from({length: rng(5, 20)}, () => makeObj()),
   }, null, 2);
 }
