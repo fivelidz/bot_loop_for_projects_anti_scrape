@@ -133,6 +133,20 @@ function processFile(filePath, dryRun) {
     return;
   }
 
+  // Guard: NEVER obfuscate index/landing pages.
+  // These are the first thing security scanners see; obfuscation triggers
+  // false-positive malware/phishing flags (incident: 2026-07-14).
+  // Only demo asset pages under /demos/ should be obfuscated.
+  const base = path.basename(filePath);
+  const dir = path.dirname(filePath);
+  const isIndexPage = base === 'index.html' || base === 'index.htm';
+  const isUnderDemos = dir.split(path.sep).includes('demos');
+  if (isIndexPage && !isUnderDemos) {
+    console.log(`  🚫 SKIP (index/landing page — never obfuscate): ${filePath}`);
+    console.log(`     See OBFUSCATION_PROTOCOL.md → "Pages That Must NOT Be Obfuscated"`);
+    return;
+  }
+
   const html = fs.readFileSync(filePath, 'utf8');
   const { processed, results } = obfuscateInlineScripts(html, filePath);
 
